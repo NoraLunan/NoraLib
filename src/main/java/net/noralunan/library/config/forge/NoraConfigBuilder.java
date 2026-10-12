@@ -1,4 +1,4 @@
-package net.noralunan.library.config;
+package net.noralunan.library.config.forge;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
@@ -12,7 +12,8 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class NoraConfigBuilder {
+class NoraConfigBuilder
+{
     protected final Builder builder;
     protected StringBuilder comment;
     protected boolean suffix;
@@ -51,7 +52,7 @@ public class NoraConfigBuilder {
     }
 
     @SuppressWarnings("unchecked")
-    public <E extends Enum<E>> ConfigValue<String> entryIn(String key, E def)
+    public <E extends Enum<E>> ConfigValue<String> entry(String key, E def)
     {
         Class<E> clazz = (Class<E>) def.getClass();
 
@@ -87,9 +88,8 @@ public class NoraConfigBuilder {
 
     public static class IntBuilder extends NumberBuilder<Integer>
     {
-        protected IntBuilder(Integer min, Integer max)
-        {
-            super(min, max);
+        protected IntBuilder(NoraConfig context, Integer min, Integer max) {
+            super(context, min, max);
         }
 
         @Override
@@ -111,10 +111,10 @@ public class NoraConfigBuilder {
         }
     }
 
-    public static class LongBuilder extends NumberBuilder<Long> {
-        protected LongBuilder(Long min, Long max)
-        {
-            super(min, max);
+    public static class LongBuilder extends NumberBuilder<Long>
+    {
+        protected LongBuilder(NoraConfig context, Long min, Long max) {
+            super(context, min, max);
         }
 
         @Override
@@ -138,9 +138,8 @@ public class NoraConfigBuilder {
 
     public static class DoubleBuilder extends NumberBuilder<Double>
     {
-        protected DoubleBuilder(Double min, Double max)
-        {
-            super(min, max);
+        protected DoubleBuilder(NoraConfig context, Double min, Double max) {
+            super(context, min, max);
         }
 
         @Override
@@ -162,8 +161,9 @@ public class NoraConfigBuilder {
         }
     }
 
-    public static abstract class NumberBuilder<N extends Number> extends NoraConfigBuilder
+    public static abstract class NumberBuilder<N extends Number>
     {
+        private final NoraConfigBuilder context;
         protected N min;
         protected N max;
 
@@ -173,24 +173,25 @@ public class NoraConfigBuilder {
 
         protected abstract Predicate<Object> verify();
 
-        private NumberBuilder(N min, N max)
+        private NumberBuilder(NoraConfigBuilder context, N min, N max)
         {
+            this.context = context;
             this.min = min;
             this.max = max;
         }
 
-        public ConfigValue<N> entryRange(String key, N def)
+        public ConfigValue<N> entry(String key, N def)
         {
             String suffix;
-            if (super.row)
+            if (this.context.row)
             {
                 suffix = "\n " + defNewRow(def, this.min, this.max);
-                super.row = false;
+                this.context.row = false;
             }
             else
                 suffix = defSuffix(def, this.min, this.max);
 
-            return super.entry(key, def, verify(), suffix);
+            return this.context.entry(key, def, verify(), suffix);
         }
 
         private String defSuffix(N def, N min, N max)
@@ -221,12 +222,14 @@ public class NoraConfigBuilder {
         }
     }
 
-    public static class ListBuilder extends NoraConfigBuilder
+    public static class ListBuilder
     {
+        private final NoraConfigBuilder context;
         private final boolean empty;
 
-        protected ListBuilder(boolean allowEmpty)
+        protected ListBuilder(NoraConfig context, boolean allowEmpty)
         {
+            this.context = context;
             this.empty = allowEmpty;
         }
 
@@ -234,9 +237,9 @@ public class NoraConfigBuilder {
         public <T> ConfigValue<List<? extends T>> entry(String key, List<T> def, Predicate<Object> validator)
         {
             if (this.empty)
-                return super.builder.defineListAllowEmpty(Lists.newArrayList(DOT_SPLITTER.split(key)), () -> def, validator);
+                return this.context.builder.defineListAllowEmpty(Lists.newArrayList(DOT_SPLITTER.split(key)), () -> def, validator);
             else
-                return super.builder.defineList(key, def, validator);
+                return this.context.builder.defineList(key, def, validator);
         }
 
         public <T> ConfigValue<List<? extends T>> entryList(String key, List<T> def, Class<?> validator)
@@ -251,21 +254,22 @@ public class NoraConfigBuilder {
         }
     }
 
-    public static class OptionBuilder<T> extends NoraConfigBuilder
+    public static class OptionBuilder<T>
     {
         private final List<T> option;
+        private final NoraConfigBuilder context;
 
-        protected OptionBuilder(List<T> option, StringBuilder comment)
+        protected OptionBuilder(List<T> option, NoraConfig context)
         {
             this.option = option;
-            this.comment = comment;
+            this.context = context;
         }
 
-        public ConfigValue<T> entryIn(String key, T def)
+        public ConfigValue<T> entry(String key, T def)
         {
-            String depict = combine(def, this.option, super.comment, super.row, super.suffix);
-            super.comment.setLength(0);
-            return super.builder.comment(depict).defineInList(key, def, this.option);
+            String depict = combine(def, this.option, this.context.comment, this.context.row, this.context.suffix);
+            this.context.comment.setLength(0);
+            return this.context.builder.comment(depict).defineInList(key, def, this.option);
         }
 
         private static <T> String combine(T def, List<T> options, StringBuilder depict, boolean line, boolean suffix)

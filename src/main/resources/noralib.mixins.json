@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.noralunan.library.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "noralib.refmap.json",
+  "mixins": [
+    "LevelMixin",
+    "LivingEntityMixin",
+    "ServerLevelMixin"
+  ],
+  "client": []
+}

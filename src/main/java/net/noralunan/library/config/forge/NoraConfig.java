@@ -1,9 +1,11 @@
-package net.noralunan.library.config;
+package net.noralunan.library.config.forge;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
+import net.noralunan.library.config.ConfigStackException;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
@@ -57,7 +59,7 @@ public class NoraConfig extends NoraConfigBuilder
         return this;
     }
 
-    public NoraConfigBuilder key(String key)
+    public NoraConfig key(String key)
     {
         super.builder.translation(key);
         return this;
@@ -111,16 +113,26 @@ public class NoraConfig extends NoraConfigBuilder
         this.depth = 0;
     }
 
-    public NoraConfigBuilder lineBreak()
+    public NoraConfig lineBreak()
     {
         super.row = true;
         return this;
     }
 
-    public NoraConfigBuilder noSuffix()
+    public NoraConfig noSuffix()
     {
         super.suffix = false;
         return this;
+    }
+
+    public ListBuilder list(boolean allowEmpty)
+    {
+        return new ListBuilder(this, allowEmpty);
+    }
+
+    public ListBuilder list()
+    {
+        return list(false);
     }
 
     public IntBuilder min(int value)
@@ -135,7 +147,7 @@ public class NoraConfig extends NoraConfigBuilder
 
     public IntBuilder range(int min, int max)
     {
-        return new IntBuilder(min, max);
+        return new IntBuilder(this, min, max);
     }
 
     public LongBuilder min(long value)
@@ -150,27 +162,33 @@ public class NoraConfig extends NoraConfigBuilder
 
     public LongBuilder range(long min, long max)
     {
-        return new LongBuilder(min, max);
+        return new LongBuilder(this, min, max);
     }
 
     public DoubleBuilder min(double value)
     {
-        return range(value, Double.NEGATIVE_INFINITY);
+        return range(value, Double.POSITIVE_INFINITY);
     }
 
     public DoubleBuilder max(double value)
     {
-        return range(Double.POSITIVE_INFINITY, value);
+        return range(Double.NEGATIVE_INFINITY, value);
     }
 
     public DoubleBuilder range(double min, double max)
     {
-        return new DoubleBuilder(min, max);
+        return new DoubleBuilder(this, min, max);
     }
 
     public <T> OptionBuilder<T> in(List<T> option)
     {
-        return new OptionBuilder<>(option, super.comment);
+        return new OptionBuilder<>(option, this);
+    }
+
+    @SafeVarargs
+    public final <T> OptionBuilder<T> in(T... option)
+    {
+        return new OptionBuilder<>(Arrays.stream(option).toList(), this);
     }
 
     private static class BannerUtil
