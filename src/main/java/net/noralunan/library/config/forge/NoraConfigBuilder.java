@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 class NoraConfigBuilder
 {
     protected final Builder builder;
-    protected StringBuilder comment;
+    protected final StringBuilder comment;
     protected boolean suffix;
     protected boolean row;
 
@@ -164,8 +164,8 @@ class NoraConfigBuilder
     public static abstract class NumberBuilder<N extends Number>
     {
         private final NoraConfigBuilder context;
-        protected N min;
-        protected N max;
+        protected final N min;
+        protected final N max;
 
         protected abstract N getMin();
 
