@@ -226,31 +226,66 @@ class NoraConfigBuilder
     {
         private final NoraConfigBuilder context;
         private final boolean empty;
+        private Predicate<Object> validator;
 
         protected ListBuilder(NoraConfig context, boolean allowEmpty)
         {
             this.context = context;
             this.empty = allowEmpty;
+            this.validator = Objects::nonNull;
+        }
+
+        protected ListBuilder(NoraConfig context, Predicate<Object> validator)
+        {
+            this.context = context;
+            this.empty = false;
+            this.validator = validator;
+        }
+
+        public ListBuilder validator(Predicate<Object> validator)
+        {
+            this.validator = this.validator.and(validator);
+            return this;
+        }
+
+        public ListBuilder validator(Class<?> validator)
+        {
+            return validator(validator::isInstance);
         }
 
         private static final Splitter DOT_SPLITTER = Splitter.on(".");
-        public <T> ConfigValue<List<? extends T>> entry(String key, List<T> def, Predicate<Object> validator)
-        {
-            if (this.empty)
-                return this.context.builder.defineListAllowEmpty(Lists.newArrayList(DOT_SPLITTER.split(key)), () -> def, validator);
-            else
-                return this.context.builder.defineList(key, def, validator);
-        }
-
-        public <T> ConfigValue<List<? extends T>> entry(String key, List<T> def, Class<?> validator)
-        {
-            return entry(key, def, validator::isInstance);
-        }
-
         public <T> ConfigValue<List<? extends T>> entry(String key, List<T> def)
         {
-            Predicate<Object> validator = def.isEmpty() ? Objects::nonNull : object ->  def.get(0).getClass().isInstance(object);
-            return entry(key, def, validator);
+            StringBuilder comment = this.context.comment;
+            boolean isEmpty = comment.isEmpty();
+            boolean isLine = this.context.row;
+
+            if (this.context.suffix)
+            {
+                String prefix = "";
+                if (isEmpty) prefix = " ";
+                else if (isLine) prefix = "\n ";
+
+                String suffix = (isEmpty || isLine) ? SuffixUtil.defNewRow(def) : SuffixUtil.defSuffix(def);
+
+                comment.append(prefix).append(suffix);
+            }
+
+            if (!isEmpty)
+            {
+                this.context.builder.comment(comment.toString());
+                comment.setLength(0);
+                if (isLine)
+                {
+                    this.context.row = false;
+                }
+            }
+
+            if (this.empty)
+                return this.context.builder
+                        .defineListAllowEmpty(Lists.newArrayList(DOT_SPLITTER.split(key)), () -> def, this.validator); // 兼容旧版Forge
+            else
+                return this.context.builder.defineList(key, def, this.validator);
         }
     }
 

@@ -8,6 +8,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class NoraConfig extends NoraConfigBuilder
 {
@@ -39,7 +40,10 @@ public class NoraConfig extends NoraConfigBuilder
     {
         if (depict != null)
         {
-            super.comment.append(" ").append(depict.replace("\n", "\n "));
+            if (super.comment.isEmpty()) super.comment.append(" ");
+            else super.comment.append("\n ");
+
+            super.comment.append(depict.replace("\n", "\n "));
         }
         return this;
     }
@@ -52,7 +56,10 @@ public class NoraConfig extends NoraConfigBuilder
             {
                 if (single != null)
                 {
-                    super.comment.append(" ").append(single.replace("\n", "\n "));
+                    if (super.comment.isEmpty()) super.comment.append(" ");
+                    else super.comment.append("\n ");
+
+                    super.comment.append(single.replace("\n", "\n "));
                 }
             }
         }
@@ -135,6 +142,21 @@ public class NoraConfig extends NoraConfigBuilder
         return list(false);
     }
 
+    public ListBuilder allowEmpty()
+    {
+        return list(true);
+    }
+
+    public ListBuilder validator(Predicate<Object> validator)
+    {
+        return new ListBuilder(this, validator);
+    }
+
+    public ListBuilder validator(Class<?> validator)
+    {
+        return validator(validator::isInstance);
+    }
+
     public IntBuilder min(int value)
     {
         return range(value, Integer.MAX_VALUE);
@@ -210,7 +232,7 @@ public class NoraConfig extends NoraConfigBuilder
                             " Version: " + version,
                             " ConfigType: " + target,
                             banner("-", 0),
-                            " " + depict,
+                            depict,
                             banner("=", 0)
                     };
         }
@@ -223,7 +245,7 @@ public class NoraConfig extends NoraConfigBuilder
             return new String[]
                     {
                             banner("=", indent),
-                            " " + depict,
+                            depict,
                             banner("=", indent)
                     };
         }
