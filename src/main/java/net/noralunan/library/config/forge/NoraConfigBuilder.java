@@ -242,12 +242,12 @@ class NoraConfigBuilder
                 return this.context.builder.defineList(key, def, validator);
         }
 
-        public <T> ConfigValue<List<? extends T>> entryList(String key, List<T> def, Class<?> validator)
+        public <T> ConfigValue<List<? extends T>> entry(String key, List<T> def, Class<?> validator)
         {
             return entry(key, def, validator::isInstance);
         }
 
-        public <T> ConfigValue<List<? extends T>> entryList(String key, List<T> def)
+        public <T> ConfigValue<List<? extends T>> entry(String key, List<T> def)
         {
             Predicate<Object> validator = def.isEmpty() ? Objects::nonNull : object ->  def.get(0).getClass().isInstance(object);
             return entry(key, def, validator);
