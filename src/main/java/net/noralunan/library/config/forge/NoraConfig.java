@@ -7,8 +7,10 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class NoraConfig extends NoraConfigBuilder
 {
@@ -72,6 +74,12 @@ public class NoraConfig extends NoraConfigBuilder
         return this;
     }
 
+    public NoraConfig restart()
+    {
+        this.builder.worldRestart();
+        return this;
+    }
+
     public NoraConfig header(String name, String version, ModConfig.Type type)
     {
         super.builder.comment(BannerUtil.header(name, version, type, super.comment.toString()));
@@ -79,7 +87,7 @@ public class NoraConfig extends NoraConfigBuilder
         return this;
     }
 
-    public void layer(String path)
+    public StackBuilder layer(String path)
     {
         if (!super.comment.isEmpty())
         {
@@ -88,6 +96,7 @@ public class NoraConfig extends NoraConfigBuilder
         }
         super.builder.push(path);
         this.depth++;
+        return new StackBuilder(this);
     }
 
     public void out()
@@ -118,6 +127,41 @@ public class NoraConfig extends NoraConfigBuilder
 
         super.builder.pop(this.depth);
         this.depth = 0;
+    }
+
+    public static class StackBuilder
+    {
+        private final NoraConfig context;
+        private StackBuilder(NoraConfig context)
+        {
+            this.context = context;
+        }
+
+        public void nest(Consumer<NoraConfig> group)
+        {
+            group.accept(this.context);
+            this.context.out();
+        }
+
+        public void nest(Runnable group)
+        {
+            group.run();
+            this.context.out();
+        }
+
+        public <T> T nest(Function<NoraConfig, T> group)
+        {
+            T result = group.apply(this.context);
+            this.context.out();
+            return result;
+        }
+
+        public <T> T nest(Supplier<T> group)
+        {
+            T result = group.get();
+            this.context.out();
+            return result;
+        }
     }
 
     public NoraConfig lineBreak()

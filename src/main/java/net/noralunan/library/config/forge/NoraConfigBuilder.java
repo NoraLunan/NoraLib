@@ -27,12 +27,6 @@ class NoraConfigBuilder
         this.row = false;
     }
 
-    public NoraConfigBuilder restart()
-    {
-        this.builder.worldRestart();
-        return this;
-    }
-
     private <T> ConfigValue<T> entry(String key, T def, Predicate<Object> validator, String suffix)
     {
         if (this.suffix)
@@ -73,7 +67,7 @@ class NoraConfigBuilder
         String suffix;
         if (this.row)
         {
-            suffix = "\n " + SuffixUtil.defNewRow(def);
+            suffix = (this.comment.isEmpty() ? " " : "\n ") + SuffixUtil.defNewRow(def);
             this.row = false;
         }
         else
@@ -185,7 +179,7 @@ class NoraConfigBuilder
             String suffix;
             if (this.context.row)
             {
-                suffix = "\n " + defNewRow(def, this.min, this.max);
+                suffix = (this.context.comment.isEmpty() ? " " : "\n ") + defNewRow(def, this.min, this.max);
                 this.context.row = false;
             }
             else

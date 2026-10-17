@@ -3,18 +3,18 @@ package net.noralunan.library;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.noralunan.library.common.NoraLogger;
-import net.noralunan.library.common.event.NoraTickEvent;
+import net.noralunan.library.common.event.NoraEvent;
 
 @Mod(NoraLib.MOD_ID)
 public class NoraLib
 {
     public static final String MOD_ID = "noralib";
     public static final String MOD_NAME = "Nora Lib";
-    public static final String VERSION = "0.2.14";
+    public static final String VERSION = "0.2.15";
 
     public NoraLib()
     {
-        MinecraftForge.EVENT_BUS.register(NoraTickEvent.Post.class);
+        MinecraftForge.EVENT_BUS.register(NoraEvent.class);
     }
 
     public static NoraLogger logger()
