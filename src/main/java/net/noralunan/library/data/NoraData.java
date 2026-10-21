@@ -8,8 +8,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -25,7 +23,7 @@ import java.util.*;
 import java.util.function.Function;
 
 @SuppressWarnings("unused")
-public class NoraData<T>
+public class NoraData<T extends ICapability<T>>
 {
     private static final NoraLogger LOGGER = NoraLib.logger();
 
@@ -48,10 +46,9 @@ public class NoraData<T>
     {
         if (holder.registered) return;
         holder.registered = true;
-        MinecraftForge.EVENT_BUS.addListener(holder::attach);
+        MinecraftForge.EVENT_BUS.addGenericListener(Entity.class, holder::attach);
         MinecraftForge.EVENT_BUS.addListener(holder::copyData);
     }
-
 
     private final Capability<T> capability;
     private final Set<Saved<?>> templates;
@@ -61,7 +58,7 @@ public class NoraData<T>
 
     private NoraData(Set<Saved<?>> templates, Function<Builder, T> factory, T object, ResourceLocation id)
     {
-        this.capability = CapabilityManager.get(new CapabilityToken<>(){});
+        this.capability = object.capability();
         this.templates = templates;
         this.factory = factory;
         this.id = id;
@@ -168,7 +165,7 @@ public class NoraData<T>
             this.id = id;
         }
 
-        public <T> NoraData<T> create(Function<Builder, T> function)
+        public <T extends ICapability<T>> NoraData<T> create(Function<Builder, T> function)
         {
             Builder builder = new Builder();
             T object = function.apply(builder);
@@ -177,7 +174,7 @@ public class NoraData<T>
         }
     }
 
-    public static class Provider<T> implements ICapabilityProvider, INBTSerializable<Tag>
+    public static class Provider<T extends ICapability<T>> implements ICapabilityProvider, INBTSerializable<Tag>
     {
         private final Set<Saved<?>> savers;
         private final LazyOptional<T> lazy;
