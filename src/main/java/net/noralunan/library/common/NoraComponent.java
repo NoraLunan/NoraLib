@@ -6,6 +6,7 @@ import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class NoraComponent implements Component {
@@ -153,13 +154,13 @@ public class NoraComponent implements Component {
         return this;
     }
 
-    public NoraComponent append(String text) {
-        this.component = component.append(text);
+    public NoraComponent append(Component component) {
+        this.component = this.component.append(component);
         return this;
     }
 
     public NoraComponent insertion(String text) {
-        this.component = component.withStyle(Style.EMPTY.withInsertion(text));
+        this.component = this.component.withStyle(Style.EMPTY.withInsertion(text));
         return this;
     }
 

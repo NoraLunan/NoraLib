@@ -7,17 +7,21 @@ import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
 public class NoraLogger {
-    public static final StackWalker STACK_WALKER = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
+    /**
+     * @see NoraHelper
+     */
+    @Deprecated(forRemoval = true, since = "0.2.16")
+    public static final StackWalker STACK_WALKER = NoraHelper.STACK_WALKER;
 
     public static NoraLogger get() {
-        Class<?> clazz = STACK_WALKER.getCallerClass();
+        Class<?> clazz = NoraHelper.STACK_WALKER.getCallerClass();
         return clazz.isAnnotationPresent(Mod.class)
                 ? get(clazz.getAnnotation(Mod.class).value(), "MainClass")
                 : get(clazz.getName(), "");
     }
 
     public static NoraLogger get(String name) {
-        return new NoraLogger(name, STACK_WALKER.getCallerClass().getSimpleName());
+        return new NoraLogger(name, NoraHelper.STACK_WALKER.getCallerClass().getSimpleName());
     }
 
     public static NoraLogger get(String name, Class<?> clazz) {

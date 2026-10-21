@@ -1,5 +1,6 @@
 package net.noralunan.library.common;
 
+import net.minecraft.server.level.ColumnPos;
 import net.minecraft.world.phys.Vec2;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -40,7 +41,7 @@ public class NoraMath {
     /**
      * @param place 0 ~ 8
      */
-    public static double retain(double target, double place) {
+    public static double retain(double target, int place) {
         if (place < 0 || place > 8) {
             throw new IllegalArgumentException();
         }
@@ -55,7 +56,7 @@ public class NoraMath {
         return Math.floorMod(a, b) == 0;
     }
 
-    public static Vec2 nextPlane(int x, int z, int min, int max) {
+    public static ColumnPos nextPlane(int x, int z, int min, int max) {
         if (min > max) {
             throw new IllegalArgumentException();
         }
@@ -63,6 +64,17 @@ public class NoraMath {
         double distance = nextDouble(min, max);
         int rx = x + round(distance * Math.cos(theta));
         int rz = z + round(distance * Math.sin(theta));
+        return new ColumnPos(rx, rz);
+    }
+
+    public static Vec2 nextPlane(float x, float z, double min, double max) {
+        if (min > max) {
+            throw new IllegalArgumentException();
+        }
+        double theta = nextDouble() * Math.PI * 2;
+        double distance = nextDouble(min, max);
+        float rx = x + round(distance * Math.cos(theta));
+        float rz = z + round(distance * Math.sin(theta));
         return new Vec2(rx, rz);
     }
 

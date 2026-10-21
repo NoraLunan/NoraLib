@@ -1,5 +1,6 @@
 package net.noralunan.library.config.forge;
 
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
 import net.noralunan.library.config.ConfigStackException;
@@ -66,6 +67,11 @@ public class NoraConfig extends NoraConfigBuilder
             }
         }
         return this;
+    }
+
+    public NoraConfig local(String key)
+    {
+        return depict(Component.translatable(key).getString());
     }
 
     public NoraConfig key(String key)
