@@ -106,16 +106,6 @@ class SavedInt extends Saved<Integer>
     {
         builder.setLifecycle(this.lifecycle).defInt(super.key, super.default_value);
     }
-
-    public void add()
-    {
-        this.value++;
-    }
-
-    public void add(int value)
-    {
-        this.value += value;
-    }
 }
 
 class SavedLong extends Saved<Long>
@@ -141,11 +131,6 @@ class SavedLong extends Saved<Long>
     protected void copyToBuilder(NoraData.Builder builder)
     {
         builder.setLifecycle(this.lifecycle).defLong(super.key, super.default_value);
-    }
-
-    public void add(long value)
-    {
-        this.value += value;
     }
 }
 
@@ -173,11 +158,6 @@ class SavedFloat extends Saved<Float>
     {
         builder.setLifecycle(this.lifecycle).defFloat(super.key, super.default_value);
     }
-
-    public void add(float value)
-    {
-        this.value += value;
-    }
 }
 
 class SavedDouble extends Saved<Double>
@@ -203,11 +183,6 @@ class SavedDouble extends Saved<Double>
     protected void copyToBuilder(NoraData.Builder builder)
     {
         builder.setLifecycle(this.lifecycle).defDouble(super.key, super.default_value);
-    }
-
-    public void add(double value)
-    {
-        this.value += value;
     }
 }
 
