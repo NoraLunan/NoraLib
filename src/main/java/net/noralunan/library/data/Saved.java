@@ -4,6 +4,9 @@ import net.minecraft.nbt.CompoundTag;
 
 import java.lang.reflect.Field;
 
+/**
+ * 字段名必须严格匹配 key，否则该框架无法识别
+ */
 public abstract class Saved<T>
 {
     protected T value;

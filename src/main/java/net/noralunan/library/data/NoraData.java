@@ -64,38 +64,40 @@ public class NoraData<T extends ICapability<T>>
         this.id = id;
 
         Class<?> clazz = object.getClass();
-        templates.forEach(saved -> {
-            try
-            {
-                var field = clazz.getDeclaredField(saved.key);
-                if (Saved.class.isAssignableFrom(field.getType()))
-                {
-                    field.setAccessible(true);
-                    saved.attachField(field);
-                }
-                else
-                    LOGGER.warn("Field {} is not a Saved type, cache skipped", saved.key);
-            }
-            catch (NoSuchFieldException exception)
-            {
-                LOGGER.error("Failed to sync data: Field {} not found in class {}: ",
-                        saved.key,
-                        clazz.getName(),
-                        exception
-                );
-            }
-        });
 
-        this.templates.forEach(template -> {
-            if (template.cache_field == null)
-            {
-                throw new NullPointerException("Saved key "
-                        + template.key
-                        + " has no matched field in class "
-                        + clazz.getName()
-                );
-            }
-        });
+        Map<String, Saved<?>> map = new HashMap<>();
+        templates.forEach(saved -> map.put(saved.key, saved));
+
+        Arrays.stream(clazz.getDeclaredFields())
+                .filter(field -> Saved.class.isAssignableFrom(field.getType()))
+                .forEach(field -> {
+                    String key;
+                    if (field.isAnnotationPresent(NbtKey.class))
+                        key = field.getAnnotation(NbtKey.class).value();
+                    else
+                        key = field.getName();
+
+                    Saved<?> saved = map.get(key);
+                    if (saved == null)
+                    {
+                        throw new NullPointerException("Saved key "
+                                + key
+                                + " has no matched field in class "
+                                + clazz.getName()
+                        );
+                    }
+                    else
+                    {
+                        field.setAccessible(true);
+                        saved.attachField(field);
+                        map.remove(key);
+                    }
+                });
+
+        if (!map.isEmpty())
+        {
+            throw new IllegalStateException("Unmatched templates found for keys: " + map.keySet());
+        }
     }
 
     public T of(Player player)
