@@ -58,7 +58,7 @@ public abstract class FieldHandler<T>
         this.value = defaultValue;
     }
 
-    <C extends ICapability<C>> void reset(C instance)
+    final <C extends ICapability<C>> void reset(C instance)
     {
         try
         {
@@ -70,7 +70,7 @@ public abstract class FieldHandler<T>
         }
     }
 
-    <C extends ICapability<C>> void copy(C from, C to)
+    final <C extends ICapability<C>> void copy(C from, C to)
     {
         try
         {
@@ -83,7 +83,7 @@ public abstract class FieldHandler<T>
     }
 
     @SuppressWarnings("unchecked")
-    <C extends ICapability<C>> T getValue(C instance) throws IllegalAccessException, ClassCastException
+    final <C extends ICapability<C>> T getValue(C instance) throws IllegalAccessException, ClassCastException
     {
         return (T) this.field.get(instance);
     }

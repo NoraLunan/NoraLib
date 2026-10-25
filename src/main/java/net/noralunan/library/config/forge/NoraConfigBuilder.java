@@ -4,14 +4,15 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import net.minecraftforge.common.ForgeConfigSpec.Builder;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
+import net.noralunan.library.config.SuffixUtil;
 
-import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+@Deprecated(since = "0.2.18")
 class NoraConfigBuilder
 {
     protected final Builder builder;
@@ -336,25 +337,4 @@ class NoraConfigBuilder
         }
     }
 
-    private static class SuffixUtil
-    {
-        private static String defSuffix(Object value)
-        {
-            return " [" + format(value, null) + "]";
-        }
-
-        private static String defNewRow(Object value)
-        {
-            return format(value, null);
-        }
-
-        private static String format(Object value, @Nullable String range)
-        {
-            if (range == null)
-            {
-                return String.format("Default: %s", value);
-            }
-            return String.format("Range: %s, Default: %s", range, value);
-        }
-    }
 }

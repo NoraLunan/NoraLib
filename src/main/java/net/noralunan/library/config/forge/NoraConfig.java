@@ -13,6 +13,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+@Deprecated(since = "0.2.18")
 public class NoraConfig extends NoraConfigBuilder
 {
     private ForgeConfigSpec spec;
@@ -260,7 +261,7 @@ public class NoraConfig extends NoraConfigBuilder
     @SafeVarargs
     public final <T> OptionBuilder<T> in(T... option)
     {
-        return new OptionBuilder<>(Arrays.stream(option).toList(), this);
+        return in(Arrays.asList(option));
     }
 
     private static class BannerUtil
