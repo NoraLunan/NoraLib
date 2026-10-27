@@ -12,7 +12,8 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-@Deprecated(since = "0.2.18")
+@SuppressWarnings("removal")
+@Deprecated(since = "0.2.18", forRemoval = true)
 class NoraConfigBuilder
 {
     protected final Builder builder;

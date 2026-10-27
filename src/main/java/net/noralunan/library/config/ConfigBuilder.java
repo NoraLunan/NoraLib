@@ -1,5 +1,6 @@
 package net.noralunan.library.config;
 
+import net.noralunan.library.common.NoraMath;
 import net.noralunan.library.config.ConfigEntry.*;
 
 import java.util.*;
@@ -309,7 +310,7 @@ public class ConfigBuilder
         Integer maxValue() { return Integer.MAX_VALUE; }
 
         @Override
-        Predicate<Integer> verify() { return value -> value >= this.min && value <= this.max; }
+        Predicate<Integer> verify() { return value -> NoraMath.between(value, this.min, this.max); }
     }
 
     public static class LongBuilder extends NumberBuilder<Long>
@@ -323,7 +324,7 @@ public class ConfigBuilder
         Long maxValue() { return Long.MAX_VALUE; }
 
         @Override
-        Predicate<Long> verify() { return value -> value >= this.min && value <= this.max; }
+        Predicate<Long> verify() { return value -> NoraMath.between(value, this.min, this.max); }
     }
 
     public static class DoubleBuilder extends NumberBuilder<Double>
@@ -337,7 +338,7 @@ public class ConfigBuilder
         Double maxValue() { return Double.POSITIVE_INFINITY; }
 
         @Override
-        Predicate<Double> verify() { return value -> value >= this.min && value <= this.max; }
+        Predicate<Double> verify() { return value -> NoraMath.between(value, this.min, this.max); }
     }
 
     public static class ListBuilder<T> extends EntryBuilder<List<T>>

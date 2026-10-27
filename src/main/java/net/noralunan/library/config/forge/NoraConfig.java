@@ -13,7 +13,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-@Deprecated(since = "0.2.18")
+@SuppressWarnings("removal")
+@Deprecated(since = "0.2.18", forRemoval = true)
 public class NoraConfig extends NoraConfigBuilder
 {
     private ForgeConfigSpec spec;

@@ -57,14 +57,8 @@ public class NoraMath {
     }
 
     public static ColumnPos nextPlane(int x, int z, int min, int max) {
-        if (min > max) {
-            throw new IllegalArgumentException();
-        }
-        double theta = nextDouble() * Math.PI * 2;
-        double distance = nextDouble(min, max);
-        int rx = x + round(distance * Math.cos(theta));
-        int rz = z + round(distance * Math.sin(theta));
-        return new ColumnPos(rx, rz);
+        Vec2 pos = nextPlane((float) x, z, min, max);
+        return new ColumnPos(round(pos.x), round(pos.y));
     }
 
     public static Vec2 nextPlane(float x, float z, double min, double max) {
@@ -76,6 +70,22 @@ public class NoraMath {
         float rx = x + round(distance * Math.cos(theta));
         float rz = z + round(distance * Math.sin(theta));
         return new Vec2(rx, rz);
+    }
+
+    public static boolean between(long target, long left, long right) {
+        return target >= left && target <= right;
+    }
+
+    public static boolean between(double target, double left, double right) {
+        return target >= left && target <= right;
+    }
+
+    public static boolean within(long target, long left, long right) {
+        return target > left && target < right;
+    }
+
+    public static boolean within(double target, double left, double right) {
+        return target > left && target < right;
     }
 
 }

@@ -46,10 +46,18 @@ public class SimpleConfig
 
     public static void register(SimpleConfig config, String path)
     {
-        String cfg = FMLPaths.CONFIGDIR.get().toString() + File.separator;
-        String pth = path.startsWith(cfg) ? path : cfg + path;
-        pth = path.endsWith(".toml") ? pth : pth + ".toml";
-        config.file = new File(pth);
+        register(config, Path.of(path));
+    }
+
+    public static void register(SimpleConfig config, Path path)
+    {
+        if (!path.endsWith(".toml"))
+            throw new IllegalArgumentException("Must be a Toml file");
+
+        Path pth = path.isAbsolute() ? path : FMLPaths.CONFIGDIR.get().resolve(path);
+        pth = pth.toAbsolutePath().normalize();
+
+        config.file = pth.toFile();
         config.config = CommentedFileConfig
                 .builder(config.file)
                 .autosave()
