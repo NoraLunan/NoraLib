@@ -193,7 +193,7 @@ public class ConfigBuilder
             return this;
         }
 
-        public ConfigEntry<T> def(String key, T defaultValue)
+        public ConfigEntry<T> entry(String key, T defaultValue)
         {
             return this.def(key, defaultValue, suffix(defaultValue));
         }
@@ -252,7 +252,7 @@ public class ConfigBuilder
         abstract Predicate<N> verify();
 
         @Override
-        public ConfigEntry<N> def(String key, N defaultValue)
+        public ConfigEntry<N> entry(String key, N defaultValue)
         {
             String suffix;
             if (this.row)
@@ -359,7 +359,7 @@ public class ConfigBuilder
         }
 
         @Override
-        public ListEntry<T> def(String key, List<T> defaultValue)
+        public ListEntry<T> entry(String key, List<T> defaultValue)
         {
             var entry = new ListEntry<>(
                     this.context.path + key, defaultValue, this.validator, this.entryVerify, this.empty);
@@ -401,7 +401,7 @@ public class ConfigBuilder
         }
 
         @Override
-        public ConfigEntry<T> def(String key, T defaultValue)
+        public ConfigEntry<T> entry(String key, T defaultValue)
         {
             if (!this.options.contains(defaultValue))
             {
@@ -462,7 +462,7 @@ public class ConfigBuilder
         }
 
         @Override
-        public EnumEntry<T> def(String key, T defaultValue)
+        public EnumEntry<T> entry(String key, T defaultValue)
         {
             Class<T> clazz = (Class<T>) defaultValue.getClass();
 

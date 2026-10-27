@@ -46,7 +46,7 @@ public class SimpleConfig
 
     public static void register(SimpleConfig config, String path)
     {
-        String cfg = FMLPaths.CONFIGDIR.toString();
+        String cfg = FMLPaths.CONFIGDIR.get().toString() + File.separator;
         String pth = path.startsWith(cfg) ? path : cfg + path;
         pth = path.endsWith(".toml") ? pth : pth + ".toml";
         config.file = new File(pth);
