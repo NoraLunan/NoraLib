@@ -51,7 +51,7 @@ public class SimpleConfig
 
     public static void register(SimpleConfig config, Path path)
     {
-        if (!path.endsWith(".toml"))
+        if (!path.toString().endsWith(".toml"))
             throw new IllegalArgumentException("Must be a Toml file");
 
         Path pth = path.isAbsolute() ? path : FMLPaths.CONFIGDIR.get().resolve(path);

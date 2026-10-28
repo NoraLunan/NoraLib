@@ -129,7 +129,7 @@ public class ConfigBuilder
 
     public LongBuilder bindLong() { return new LongBuilder(this); }
 
-    public EntryBuilder<Float> bindFloat() { return bind(); }
+    public FloatBuilder bindFloat() { return new FloatBuilder(this); }
 
     public DoubleBuilder bindDouble() { return new DoubleBuilder(this); }
 
@@ -325,6 +325,20 @@ public class ConfigBuilder
 
         @Override
         Predicate<Long> verify() { return value -> NoraMath.between(value, this.min, this.max); }
+    }
+
+    public static class FloatBuilder extends NumberBuilder<Float>
+    {
+        private FloatBuilder(ConfigBuilder context) { super(context); }
+
+        @Override
+        Float minValue() { return Float.NEGATIVE_INFINITY; }
+
+        @Override
+        Float maxValue() { return Float.POSITIVE_INFINITY; }
+
+        @Override
+        Predicate<Float> verify() { return value -> NoraMath.between(value, this.min, this.max); }
     }
 
     public static class DoubleBuilder extends NumberBuilder<Double>
