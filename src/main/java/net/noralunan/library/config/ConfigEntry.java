@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class ConfigEntry<T>
@@ -33,6 +34,11 @@ public class ConfigEntry<T>
     public T get()
     {
         return this.value;
+    }
+
+    public T getDefault()
+    {
+        return this.defaultValue;
     }
 
     public synchronized void set(T value)
@@ -72,6 +78,51 @@ public class ConfigEntry<T>
         this.reset();
     }
 
+    public static abstract class NumberEntry<T extends Number> extends ConfigEntry<T>
+    {
+        final Function<Number, T> converter;
+
+        NumberEntry(String key, T defaultValue, Predicate<T> validator, Function<Number, T> converter)
+        {
+            super(key, defaultValue, validator);
+            this.converter = converter;
+        }
+
+        @Override
+        void maintain()
+        {
+            Optional<? extends Number> optional = this.standard.config.getOptional(this.key);
+            if (optional.isPresent())
+            {
+                Number num = optional.get();
+                T value = this.converter.apply(num);
+
+                if (this.validator.test(value))
+                {
+                    this.value = value;
+                    return;
+                }
+            }
+            this.reset();
+        }
+    }
+
+    public static class LongEntry extends NumberEntry<Long>
+    {
+        LongEntry(String key, Long defaultValue, Predicate<Long> validator)
+        {
+            super(key, defaultValue, validator, Number::longValue);
+        }
+    }
+
+    public static class FloatEntry extends NumberEntry<Float>
+    {
+        FloatEntry(String key, Float defaultValue, Predicate<Float> validator)
+        {
+            super(key, defaultValue, validator, Number::floatValue);
+        }
+    }
+
     public static class ListEntry<T> extends ConfigEntry<List<T>>
     {
         private final Predicate<T> entryVerify;
@@ -106,12 +157,8 @@ public class ConfigEntry<T>
                     return;
                 }
 
-                List<T> illegal = value.stream()
-                        .filter(t -> !this.entryVerify.test(t))
-                        .toList();
-                if (!illegal.isEmpty())
+                if (value.removeIf(t -> !this.entryVerify.test(t)))
                 {
-                    illegal.forEach(value::remove);
                     config.set(this.key, value);
                 }
 

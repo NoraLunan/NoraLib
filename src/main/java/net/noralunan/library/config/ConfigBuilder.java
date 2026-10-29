@@ -202,6 +202,11 @@ public class ConfigBuilder
         ConfigEntry<T> def(String key, T defaultValue, String suffix)
         {
             ConfigEntry<T> entry = new ConfigEntry<>(this.context.path + key, defaultValue, this.validator);
+            return def(key, entry, suffix);
+        }
+
+        <E extends ConfigEntry<?>> E def(String key, E entry, String suffix)
+        {
             if (this.context.suffixGlobal) this.comment.append(suffix);
             return def(key, this.comment.toString(), entry);
         }
@@ -250,7 +255,7 @@ public class ConfigBuilder
 
         abstract N minValue();
         abstract N maxValue();
-        abstract Predicate<N> verify();
+        abstract ConfigEntry<N> entry(String key, N defaultValue, String suffix);
 
         @Override
         public ConfigEntry<N> entry(String key, N defaultValue)
@@ -261,7 +266,7 @@ public class ConfigBuilder
             else
                 suffix = defSuffix(defaultValue, this.min, this.max);
 
-            return this.validator(verify()).def(key, defaultValue, suffix);
+            return entry(key, defaultValue, suffix);
         }
 
         private String defSuffix(N def, N min, N max)
@@ -310,7 +315,11 @@ public class ConfigBuilder
         Integer maxValue() { return Integer.MAX_VALUE; }
 
         @Override
-        Predicate<Integer> verify() { return value -> NoraMath.between(value, this.min, this.max); }
+        ConfigEntry<Integer> entry(String key, Integer defaultValue, String suffix)
+        {
+            return this.validator(value -> NoraMath.between(value, this.min, this.max))
+                    .def(key, defaultValue, suffix);
+        }
     }
 
     public static class LongBuilder extends NumberBuilder<Long>
@@ -324,7 +333,11 @@ public class ConfigBuilder
         Long maxValue() { return Long.MAX_VALUE; }
 
         @Override
-        Predicate<Long> verify() { return value -> NoraMath.between(value, this.min, this.max); }
+        LongEntry entry(String key, Long defaultValue, String suffix)
+        {
+            var entry = new LongEntry(this.context.path + key, defaultValue, this.validator);
+            return this.validator(value -> NoraMath.between(value, this.min, this.max)).def(key, entry, suffix);
+        }
     }
 
     public static class FloatBuilder extends NumberBuilder<Float>
@@ -338,7 +351,11 @@ public class ConfigBuilder
         Float maxValue() { return Float.POSITIVE_INFINITY; }
 
         @Override
-        Predicate<Float> verify() { return value -> NoraMath.between(value, this.min, this.max); }
+        FloatEntry entry(String key, Float defaultValue, String suffix)
+        {
+            var entry = new FloatEntry(this.context.path + key, defaultValue, this.validator);
+            return this.validator(value -> NoraMath.between(value, this.min, this.max)).def(key, entry, suffix);
+        }
     }
 
     public static class DoubleBuilder extends NumberBuilder<Double>
@@ -352,7 +369,11 @@ public class ConfigBuilder
         Double maxValue() { return Double.POSITIVE_INFINITY; }
 
         @Override
-        Predicate<Double> verify() { return value -> NoraMath.between(value, this.min, this.max); }
+        ConfigEntry<Double> entry(String key, Double defaultValue, String suffix)
+        {
+            return this.validator(value -> NoraMath.between(value, this.min, this.max))
+                    .def(key, defaultValue, suffix);
+        }
     }
 
     public static class ListBuilder<T> extends EntryBuilder<List<T>>
